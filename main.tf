@@ -19,7 +19,7 @@ locals {
   vpc_cidr   = "10.2.0.0/16"
   azs        = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  init_image           = "223615444511.dkr.ecr.eu-west-1.amazonaws.com/ecs-configmap:v0.5"
+  init_image           = "public.ecr.aws/h5g3j1b0/ecs-configmap:v0.5"
   firelens_image       = "906394416424.dkr.ecr.eu-west-1.amazonaws.com/aws-for-fluent-bit:2.26.0"
   adot_image           = "public.ecr.aws/aws-observability/aws-otel-collector:v0.19.0"
   app_mesh_envoy_image = "840364872350.dkr.ecr.eu-west-1.amazonaws.com/aws-appmesh-envoy:v1.22.2.0-prod"
@@ -90,37 +90,6 @@ module "vg_service" {
 
   app_mesh_mesh_name   = module.ecsinfra.app_mesh_mesh_name
   app_mesh_envoy_image = local.app_mesh_envoy_image
-}
-
-module "orange_service" {
-  source = "./modules/serviceorange"
-
-  service_name        = "orange"
-  task_execution_role = module.ecsinfra.task_execution_role
-  ecs_cluster         = module.ecsinfra.ecs_cluster
-
-  aws_region           = local.aws_region
-  vpc_id               = module.vpc.vpc_id
-  vpc_private_subnet_1 = module.vpc.private_subnets[0]
-  vpc_private_subnet_2 = module.vpc.private_subnets[1]
-
-  s3_bucket_name = module.ecsinfra.s3_bucket_name
-  s3_bucket_arn  = "arn:aws:s3:::${module.ecsinfra.s3_bucket_name}"
-
-  init_image     = local.init_image
-  firelens_image = local.firelens_image
-  adot_image     = local.adot_image
-
-  application_image    = local.application_image
-  application_web_port = local.application_web_port
-
-  cloud_map_namespace_id   = module.ecsinfra.cloud_map_namespace_id
-  cloud_map_namespace_name = module.ecsinfra.cloud_map_namespace_name
-
-  app_mesh_mesh_name   = module.ecsinfra.app_mesh_mesh_name
-  app_mesh_envoy_image = local.app_mesh_envoy_image
-  app_mesh_vg_name     = module.vg_service.app_mesh_vg_name
-  app_mesh_vg_sg       = module.vg_service.app_mesh_vg_sg
 }
 
 module "green_service" {
