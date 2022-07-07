@@ -166,8 +166,7 @@ resource "aws_iam_role" "vg_task_iam_role" {
 
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-    "arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess",
-    "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
+    "arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess"
   ]
 
   inline_policy {
