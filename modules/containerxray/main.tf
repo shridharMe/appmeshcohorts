@@ -1,4 +1,4 @@
-module "adot_container" {
+module "xray_container" {
   source  = "cloudposse/ecs-container-definition/aws"
   version = "0.58.1"
 
@@ -9,14 +9,10 @@ module "adot_container" {
     }
   ]
 
-  container_name  = "adot"
-  container_image = var.adot_image
+  container_name  = "xray"
+  container_image = var.xray_image
   essential       = true
-
-  command = [
-    "--config",
-    "/data/adotconfig.yaml"
-  ]
+  user            = 1337
 
   port_mappings = [
     {
@@ -26,13 +22,6 @@ module "adot_container" {
     }
   ]
 
-  mount_points = [
-    {
-      containerPath = "/data"
-      sourceVolume  = "adotvolume"
-      readOnly      = true
-    }
-  ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -43,6 +32,6 @@ module "adot_container" {
   }
 }
 
-output "adot_output" {
-  value = module.adot_container.json_map_object
+output "xray_output" {
+  value = module.xray_container.json_map_object
 }

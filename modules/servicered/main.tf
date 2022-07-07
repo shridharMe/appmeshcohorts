@@ -163,10 +163,6 @@ module "container_init" {
   init_file_three_src_file_path = "envoy_parser.conf"
   init_file_three_dst_file_path = "/firelensvolume/envoy_parser.conf"
 
-  init_file_four_s3_bucket     = var.s3_bucket_name
-  init_file_four_src_file_path = "adotconfig.yaml"
-  init_file_four_dst_file_path = "/adotvolume/adotconfig.yaml"
-
 }
 
 module "container_envoy" {
@@ -188,11 +184,11 @@ module "container_firelens" {
 
 }
 
-module "container_adot" {
-  source = "../containeradot"
+module "container_xray" {
+  source = "../containerxray"
 
   aws_region = var.aws_region
-  adot_image = var.adot_image
+  xray_image = var.xray_image
   log_group  = aws_cloudwatch_log_group.red_log_group.name
 
 }
@@ -275,7 +271,7 @@ resource "aws_ecs_task_definition" "red_task_definition" {
     module.container_init.init_output,
     module.container_firelens.firelens_output,
     module.container_envoy.envoy_output,
-    module.container_adot.adot_output,
+    module.container_xray.xray_output,
     module.container_web_app.json_map_object
   ])
 
@@ -290,9 +286,6 @@ resource "aws_ecs_task_definition" "red_task_definition" {
   }
   volume {
     name = "firelensvolume"
-  }
-  volume {
-    name = "adotvolume"
   }
 
 }
@@ -367,26 +360,38 @@ resource "aws_appmesh_virtual_router" "red_virtual_router" {
   }
 }
 
-resource "aws_appmesh_route" "red_virtual_route" {
-  name                = "${var.service_name}-color-route"
-  mesh_name           = var.app_mesh_mesh_name
-  virtual_router_name = aws_appmesh_virtual_router.red_virtual_router.name
-
-  spec {
-    http_route {
-      match {
-        prefix = "/"
-      }
-
-      action {
-        weighted_target {
-          virtual_node = aws_appmesh_virtual_node.red_virtual_node.name
-          weight       = 100
-        }
-      }
-    }
-  }
-}
+#resource "aws_appmesh_route" "red_virtual_route" {
+#  name                = "${var.service_name}-color-route"
+#  mesh_name           = var.app_mesh_mesh_name
+#  virtual_router_name = aws_appmesh_virtual_router.red_virtual_router.name
+#
+#  spec {
+#    http_route {
+#      match {
+#        prefix = "/"
+#      }
+#
+#      retry_policy {
+#        http_retry_events = [
+#          "server-error",
+#        ]
+#        max_retries = 5
+#
+#        per_retry_timeout {
+#          unit  = "s"
+#          value = 30
+#        }
+#      }
+#
+#      action {
+#        weighted_target {
+#          virtual_node = aws_appmesh_virtual_node.red_virtual_node.name
+#          weight       = 100
+#        }
+#      }
+#    }
+#  }
+#}
 
 resource "aws_appmesh_virtual_service" "red_virtual_service" {
   name      = "${var.service_name}.${var.cloud_map_namespace_name}"

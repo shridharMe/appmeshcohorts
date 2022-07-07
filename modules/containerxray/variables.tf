@@ -1,4 +1,4 @@
-variable "adot_image" {
+variable "xray_image" {
   type = string
 }
 

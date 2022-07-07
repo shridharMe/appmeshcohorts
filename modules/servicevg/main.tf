@@ -247,10 +247,6 @@ module "container_init" {
   init_file_three_src_file_path = "envoy_parser.conf"
   init_file_three_dst_file_path = "/firelensvolume/envoy_parser.conf"
 
-  init_file_four_s3_bucket     = var.s3_bucket_name
-  init_file_four_src_file_path = "adotconfig.yaml"
-  init_file_four_dst_file_path = "/adotvolume/adotconfig.yaml"
-
 }
 
 module "container_firelens" {
@@ -262,11 +258,11 @@ module "container_firelens" {
 
 }
 
-module "container_adot" {
-  source = "../containeradot"
+module "container_xray" {
+  source = "../containerxray"
 
   aws_region = var.aws_region
-  adot_image = var.adot_image
+  xray_image = var.xray_image
   log_group  = aws_cloudwatch_log_group.vg_log_group.name
 
 }
@@ -369,16 +365,13 @@ resource "aws_ecs_task_definition" "vg_task_definition" {
     module.container_init.init_output,
     module.container_firelens.firelens_output,
     module.vg_container.json_map_object,
-  module.container_adot.adot_output])
+  module.container_xray.xray_output])
 
   volume {
     name = "envoyvolume"
   }
   volume {
     name = "firelensvolume"
-  }
-  volume {
-    name = "adotvolume"
   }
 
 }

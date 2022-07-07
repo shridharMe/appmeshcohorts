@@ -42,18 +42,6 @@ module "init_container" {
     {
       name  = "DEST_FILE_PATH_FILE_3"
       value = "${var.init_file_three_dst_file_path}"
-    },
-    {
-      name  = "S3_BUCKET_FILE_4"
-      value = "${var.init_file_four_s3_bucket}"
-    },
-    {
-      name  = "SRC_FILE_PATH_FILE_4"
-      value = "${var.init_file_four_src_file_path}"
-    },
-    {
-      name  = "DEST_FILE_PATH_FILE_4"
-      value = "${var.init_file_four_dst_file_path}"
     }
   ]
 
@@ -66,11 +54,6 @@ module "init_container" {
     {
       containerPath = "/firelensvolume"
       sourceVolume  = "firelensvolume"
-      readOnly      = false
-    },
-    {
-      containerPath = "/adotvolume"
-      sourceVolume  = "adotvolume"
       readOnly      = false
     }
   ]

@@ -201,10 +201,6 @@ module "container_init" {
   init_file_three_src_file_path = "envoy_parser.conf"
   init_file_three_dst_file_path = "/firelensvolume/envoy_parser.conf"
 
-  init_file_four_s3_bucket     = var.s3_bucket_name
-  init_file_four_src_file_path = "adotconfig.yaml"
-  init_file_four_dst_file_path = "/adotvolume/adotconfig.yaml"
-
 }
 
 module "container_envoy_v1" {
@@ -236,11 +232,11 @@ module "container_firelens" {
 
 }
 
-module "container_adot" {
-  source = "../containeradot"
+module "container_xray" {
+  source = "../containerxray"
 
   aws_region = var.aws_region
-  adot_image = var.adot_image
+  xray_image = var.xray_image
   log_group  = aws_cloudwatch_log_group.blue_log_group.name
 
 }
@@ -367,7 +363,7 @@ resource "aws_ecs_task_definition" "blue_task_definition_v1" {
     module.container_init.init_output,
     module.container_firelens.firelens_output,
     module.container_envoy_v1.envoy_output,
-    module.container_adot.adot_output,
+    module.container_xray.xray_output,
     module.container_web_app_v1.json_map_object
   ])
 
@@ -382,9 +378,6 @@ resource "aws_ecs_task_definition" "blue_task_definition_v1" {
   }
   volume {
     name = "firelensvolume"
-  }
-  volume {
-    name = "adotvolume"
   }
 
 }
@@ -414,7 +407,7 @@ resource "aws_ecs_task_definition" "blue_task_definition_v2" {
     module.container_init.init_output,
     module.container_firelens.firelens_output,
     module.container_envoy_v2.envoy_output,
-    module.container_adot.adot_output,
+    module.container_xray.xray_output,
     module.container_web_app_v2.json_map_object
   ])
 
@@ -429,9 +422,6 @@ resource "aws_ecs_task_definition" "blue_task_definition_v2" {
   }
   volume {
     name = "firelensvolume"
-  }
-  volume {
-    name = "adotvolume"
   }
 
 }
@@ -563,30 +553,30 @@ resource "aws_appmesh_virtual_router" "blue_virtual_router" {
   }
 }
 
-resource "aws_appmesh_route" "blue_virtual_route" {
-  name                = "${var.service_name}-color-route"
-  mesh_name           = var.app_mesh_mesh_name
-  virtual_router_name = aws_appmesh_virtual_router.blue_virtual_router.name
-
-  spec {
-    http_route {
-      match {
-        prefix = "/"
-      }
-
-      action {
-        weighted_target {
-          virtual_node = aws_appmesh_virtual_node.blue_virtual_node_v1.name
-          weight       = 50
-        }
-        weighted_target {
-          virtual_node = aws_appmesh_virtual_node.blue_virtual_node_v2.name
-          weight       = 50
-        }
-      }
-    }
-  }
-}
+#resource "aws_appmesh_route" "blue_virtual_route" {
+#  name                = "${var.service_name}-color-route"
+#  mesh_name           = var.app_mesh_mesh_name
+#  virtual_router_name = aws_appmesh_virtual_router.blue_virtual_router.name
+#
+#  spec {
+#    http_route {
+#      match {
+#        prefix = "/"
+#      }
+#
+#      action {
+#        weighted_target {
+#          virtual_node = aws_appmesh_virtual_node.blue_virtual_node_v1.name
+#          weight       = 50
+#        }
+#        weighted_target {
+#          virtual_node = aws_appmesh_virtual_node.blue_virtual_node_v2.name
+#          weight       = 50
+#        }
+#      }
+#    }
+#  }
+#}
 
 resource "aws_appmesh_virtual_service" "blue_virtual_service" {
   name      = "${var.service_name}.${var.cloud_map_namespace_name}"
@@ -601,24 +591,24 @@ resource "aws_appmesh_virtual_service" "blue_virtual_service" {
   }
 }
 
-resource "aws_appmesh_gateway_route" "blue_gateway_route" {
-  name                 = "blue"
-  mesh_name            = var.app_mesh_mesh_name
-  virtual_gateway_name = var.app_mesh_vg_name
-
-  spec {
-    http_route {
-      action {
-        target {
-          virtual_service {
-            virtual_service_name = aws_appmesh_virtual_service.blue_virtual_service.name
-          }
-        }
-      }
-
-      match {
-        prefix = "/blue"
-      }
-    }
-  }
-}
+#resource "aws_appmesh_gateway_route" "blue_gateway_route" {
+#  name                 = "blue"
+#  mesh_name            = var.app_mesh_mesh_name
+#  virtual_gateway_name = var.app_mesh_vg_name
+#
+#  spec {
+#    http_route {
+#      action {
+#        target {
+#          virtual_service {
+#            virtual_service_name = aws_appmesh_virtual_service.blue_virtual_service.name
+#          }
+#        }
+#      }
+#
+#      match {
+#        prefix = "/blue"
+#      }
+#    }
+#  }
+#}

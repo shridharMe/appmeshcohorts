@@ -45,15 +45,3 @@ variable "init_file_three_src_file_path" {
 variable "init_file_three_dst_file_path" {
   type = string
 }
-
-variable "init_file_four_s3_bucket" {
-  type = string
-}
-
-variable "init_file_four_src_file_path" {
-  type = string
-}
-
-variable "init_file_four_dst_file_path" {
-  type = string
-}

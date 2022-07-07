@@ -21,7 +21,7 @@ locals {
 
   init_image           = "public.ecr.aws/h5g3j1b0/ecs-configmap:v0.5"
   firelens_image       = "906394416424.dkr.ecr.eu-west-1.amazonaws.com/aws-for-fluent-bit:2.26.0"
-  adot_image           = "public.ecr.aws/aws-observability/aws-otel-collector:v0.19.0"
+  xray_image           = "public.ecr.aws/xray/aws-xray-daemon:3.3.3"
   app_mesh_envoy_image = "840364872350.dkr.ecr.eu-west-1.amazonaws.com/aws-appmesh-envoy:v1.22.2.0-prod"
 
   application_image    = "public.ecr.aws/h5g3j1b0/wordechoer:v0.5"
@@ -86,7 +86,7 @@ module "vg_service" {
 
   init_image     = local.init_image
   firelens_image = local.firelens_image
-  adot_image     = local.adot_image
+  xray_image     = local.xray_image
 
   app_mesh_mesh_name   = module.ecsinfra.app_mesh_mesh_name
   app_mesh_envoy_image = local.app_mesh_envoy_image
@@ -109,7 +109,7 @@ module "green_service" {
 
   init_image     = local.init_image
   firelens_image = local.firelens_image
-  adot_image     = local.adot_image
+  xray_image     = local.xray_image
 
   application_image    = local.application_image
   application_web_port = local.application_web_port
@@ -141,7 +141,7 @@ module "red_service" {
 
   init_image     = local.init_image
   firelens_image = local.firelens_image
-  adot_image     = local.adot_image
+  xray_image     = local.xray_image
 
   application_image    = local.application_image
   application_web_port = local.application_web_port
@@ -171,7 +171,7 @@ module "blue_service" {
 
   init_image     = local.init_image
   firelens_image = local.firelens_image
-  adot_image     = local.adot_image
+  xray_image     = local.xray_image
 
   application_image    = local.application_image
   application_web_port = local.application_web_port
